@@ -1,0 +1,41 @@
+server:
+  url: "http://localhost"
+  port: 5001
+  servlet:
+    context-path: /api/keycloak
+
+frontend:
+  url: "http://localhost:3000"
+
+keycloak:
+  port : 8282
+  url: "${server.url}:${keycloak.port}"
+  realm: "repaintinggame"
+  jwt:
+    auth:
+      converter:
+        principle-attribute: preferred_username
+        resource-id: backend-game
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${keycloak.url}/realms/${keycloak.realm}
+          jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
+
+#  datasource:
+#    driver-class-name: org.postgresql.Driver
+#    url: jdbc:postgresql://localhost:5432/danilkk_db
+#    username: danilkk
+#    password: 123
+#  jpa:
+#    database: postgresql
+#    database-platform: org.hibernate.dialect.PostgreSQLDialect
+#
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /api-docs
