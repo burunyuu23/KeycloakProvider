@@ -1,13 +1,11 @@
 package com.example.keycloakprovider.service.impl;
 
-import com.example.keycloakprovider.dtos.UserDTO;
+import com.example.keycloakprovider.dtos.requests.UserDTO;
 import com.example.keycloakprovider.service.IKeycloakService;
 import com.example.keycloakprovider.util.KeycloakProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.OAuth2Constants;
-import org.keycloak.admin.client.resource.RealmResource;
-import org.keycloak.admin.client.resource.UserResource;
-import org.keycloak.admin.client.resource.UsersResource;
+import org.keycloak.admin.client.resource.*;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -31,18 +29,6 @@ public class KeycloakServiceImpl implements IKeycloakService {
                 .users()
                 .list();
     }
-
-
-    /**
-     * Metodo para buscar un usuario por su username
-     * @return List<UserRepresentation>
-     */
-    public List<UserRepresentation> findUserByUsername(String username) {
-        return KeycloakProvider.getRealmResource()
-                .users()
-                .searchByUsername(username, true);
-    }
-
 
     /**
      * Metodo para crear un usuario en keycloak

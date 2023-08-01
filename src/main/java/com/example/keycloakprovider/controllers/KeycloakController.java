@@ -1,7 +1,7 @@
 package com.example.keycloakprovider.controllers;
 
 
-import com.example.keycloakprovider.dtos.UserDTO;
+import com.example.keycloakprovider.dtos.requests.UserDTO;
 import com.example.keycloakprovider.service.IKeycloakService;
 import com.example.keycloakprovider.util.KeycloakProvider;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/user")
@@ -31,9 +30,8 @@ public class KeycloakController {
     @PreAuthorize("hasRole('user')")
     @GetMapping("/search/{username}")
     public ResponseEntity<?> searchUserByUsername(@PathVariable String username){
-        return ResponseEntity.ok(keycloakService.findUserByUsername(username));
+        return ResponseEntity.ok(KeycloakProvider.findUserByUsername(username));
     }
-
 
     @PostMapping("/create")
     public ResponseEntity<?> createUser(@RequestBody UserDTO userDTO) throws URISyntaxException {
