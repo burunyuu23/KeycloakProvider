@@ -57,6 +57,9 @@ public class KeycloakServiceImpl implements IKeycloakService {
         if (Objects.equals(userDTO.getPassword(), "")) {
             throw new FieldEmptyException("Password");
         }
+        if (userDTO.getPassword().length() <= 8) {
+            throw new FieldTooSmallException("Password", 8);
+        }
         if (Objects.equals(userDTO.getEmail(), "")) {
             throw new FieldEmptyException("Email");
         }
