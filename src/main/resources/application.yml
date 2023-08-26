@@ -15,7 +15,7 @@ keycloak:
     auth:
       converter:
         principle-attribute: preferred_username
-        resource-id: backend-game
+        resource-id: repaint-game
 
 spring:
   security:
