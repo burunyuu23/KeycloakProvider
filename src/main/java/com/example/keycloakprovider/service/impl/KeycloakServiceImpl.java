@@ -1,6 +1,7 @@
 package com.example.keycloakprovider.service.impl;
 
 import com.example.keycloakprovider.dtos.requests.UserDTO;
+import com.example.keycloakprovider.exceptions.*;
 import com.example.keycloakprovider.service.IKeycloakService;
 import com.example.keycloakprovider.util.KeycloakProvider;
 import lombok.extern.slf4j.Slf4j;
@@ -13,8 +14,10 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -47,6 +50,30 @@ public class KeycloakServiceImpl implements IKeycloakService {
         userRepresentation.setEnabled(true);
         userRepresentation.setEmailVerified(true);
 
+
+        if (Objects.equals(userDTO.getUsername(), "")) {
+            throw new FieldEmptyException("Username");
+        }
+        if (Objects.equals(userDTO.getPassword(), "")) {
+            throw new FieldEmptyException("Password");
+        }
+        if (Objects.equals(userDTO.getEmail(), "")) {
+            throw new FieldEmptyException("Email");
+        }
+        if (Objects.equals(userDTO.getFirstName(), "")) {
+            throw new FieldEmptyException("First name");
+        }
+        if (Objects.equals(userDTO.getLastName(), "")) {
+            throw new FieldEmptyException("Last name");
+        }
+
+        if (!KeycloakProvider.findUserByUsername(userDTO.getUsername()).isEmpty()) {
+            throw new UserExistException("username");
+        }
+        if (!KeycloakProvider.findUserByEmail(userDTO.getEmail()).isEmpty()) {
+            throw new UserExistException("email");
+        }
+
         Response response = usersResource.create(userRepresentation);
 
         status = response.getStatus();
@@ -64,11 +91,9 @@ public class KeycloakServiceImpl implements IKeycloakService {
 
             RealmResource realmResource = KeycloakProvider.getRealmResource();
 
-            List<RoleRepresentation> rolesRepresentation;
+            List<RoleRepresentation> rolesRepresentation = new ArrayList<>();
 
-            if (userDTO.getRoles() == null || userDTO.getRoles().isEmpty()) {
-                rolesRepresentation = List.of();
-            } else {
+            if (userDTO.getRoles() != null && !userDTO.getRoles().isEmpty()) {
                 rolesRepresentation = realmResource.roles()
                         .list()
                         .stream()
@@ -83,13 +108,8 @@ public class KeycloakServiceImpl implements IKeycloakService {
             realmResource.users().get(userId).roles().realmLevel().add(rolesRepresentation);
 
             return "User created successfully!!";
-
-        } else if (status == 409) {
-            log.error("User exist already!");
-            return "User exist already!";
         } else {
-            log.error("Error creating user, please contact with the administrator.");
-            return "Error creating user, please contact with the administrator.";
+            throw new SomethingWentWrongException();
         }
     }
 
