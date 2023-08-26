@@ -1,6 +1,6 @@
 package com.example.keycloakprovider.service.impl;
 
-import com.example.keycloakprovider.dtos.requests.UserDTO;
+import com.example.keycloakprovider.dtos.UserDTO;
 import com.example.keycloakprovider.exceptions.*;
 import com.example.keycloakprovider.service.IKeycloakService;
 import com.example.keycloakprovider.util.KeycloakProvider;

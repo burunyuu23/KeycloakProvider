@@ -1,4 +1,4 @@
-package com.example.keycloakprovider.dtos.requests;
+package com.example.keycloakprovider.dtos;
 
 import lombok.*;
 

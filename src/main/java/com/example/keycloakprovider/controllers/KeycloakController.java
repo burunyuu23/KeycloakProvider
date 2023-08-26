@@ -1,7 +1,7 @@
 package com.example.keycloakprovider.controllers;
 
 
-import com.example.keycloakprovider.dtos.requests.UserDTO;
+import com.example.keycloakprovider.dtos.UserDTO;
 import com.example.keycloakprovider.service.IKeycloakService;
 import com.example.keycloakprovider.util.KeycloakProvider;
 import org.springframework.http.ResponseEntity;
