@@ -16,6 +16,7 @@ import java.net.URISyntaxException;
 
 @RestController
 @RequestMapping("/user")
+@CrossOrigin
 public class KeycloakController {
 
     private final IKeycloakService keycloakService;
