@@ -2,18 +2,23 @@ package com.example.keycloakprovider.service.impl;
 
 import com.example.keycloakprovider.dtos.UserDTO;
 import com.example.keycloakprovider.dtos.requests.RegisterRequestDTO;
+import com.example.keycloakprovider.dtos.responses.TokensResponseDTO;
 import com.example.keycloakprovider.exceptions.*;
 import com.example.keycloakprovider.service.IKeycloakService;
 import com.example.keycloakprovider.util.KeycloakProvider;
 
 import com.google.gson.Gson;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.resource.*;
+import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -35,9 +40,11 @@ import java.util.Objects;
 public class KeycloakServiceImpl implements IKeycloakService {
 
     private Gson gson;
+    private ModelMapper modelMapper;
 
-    public KeycloakServiceImpl(Gson gson) {
+    public KeycloakServiceImpl(Gson gson, ModelMapper modelMapper) {
         this.gson = gson;
+        this.modelMapper = modelMapper;
     }
 
     /**
@@ -56,7 +63,7 @@ public class KeycloakServiceImpl implements IKeycloakService {
      * Metodo para crear un usuario en keycloak
      * @return String
      */
-    public String createUser(@NonNull UserDTO userDTO) {
+    public TokensResponseDTO createUser(@NonNull UserDTO userDTO) {
 
         int status = 0;
         UsersResource usersResource = KeycloakProvider.getUserResource();
@@ -147,7 +154,8 @@ public class KeycloakServiceImpl implements IKeycloakService {
                 throw new SomethingWentWrongException();
             }
 
-            return "User created successfully!!";
+            AccessTokenResponse accessTokenResponse = KeycloakProvider.authenticateUser(userDTO.getUsername(), userDTO.getPassword());
+            return modelMapper.map(accessTokenResponse, TokensResponseDTO.class);
         } else {
             throw new SomethingWentWrongException();
         }

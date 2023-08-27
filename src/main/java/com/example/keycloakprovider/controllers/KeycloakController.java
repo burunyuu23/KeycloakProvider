@@ -3,6 +3,7 @@ package com.example.keycloakprovider.controllers;
 
 import com.example.keycloakprovider.dtos.UserDTO;
 import com.example.keycloakprovider.dtos.requests.RegisterRequestDTO;
+import com.example.keycloakprovider.dtos.responses.TokensResponseDTO;
 import com.example.keycloakprovider.service.IKeycloakService;
 import com.example.keycloakprovider.util.KeycloakProvider;
 import org.apache.catalina.User;
@@ -36,8 +37,8 @@ public class KeycloakController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createUser(@RequestBody UserDTO userDTO) throws URISyntaxException {
-        String response = keycloakService.createUser(userDTO);
+    public ResponseEntity<TokensResponseDTO> createUser(@RequestBody UserDTO userDTO) throws URISyntaxException {
+        TokensResponseDTO response = keycloakService.createUser(userDTO);
         return ResponseEntity.created(new URI("/api/keycloak/user/create")).body(response);
     }
 
