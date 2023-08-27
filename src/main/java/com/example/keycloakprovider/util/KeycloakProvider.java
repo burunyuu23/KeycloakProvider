@@ -39,6 +39,10 @@ public class KeycloakProvider {
 
     public static RealmResource getRealmResource() {
 
+        ResteasyClient client = new ResteasyClientBuilderImpl()
+                .connectionPoolSize(10)
+                .build();
+
         Keycloak keycloak = KeycloakBuilder.builder()
                 .serverUrl(SERVER_URL)
                 .realm(REALM_MASTER)
@@ -46,28 +50,27 @@ public class KeycloakProvider {
                 .username(USER_CONSOLE)
                 .password(PASSWORD_CONSOLE)
                 .clientSecret(CLIENT_SECRET)
-                .resteasyClient(new ResteasyClientBuilderImpl()
-                        .connectionPoolSize(10)
-                        .build())
+                .resteasyClient(client)
                 .build();
 
         return keycloak.realm(REALM_NAME);
     }
 
     public static AccessTokenResponse authenticateUser(String username, String password) {
+        ResteasyClient client = new ResteasyClientBuilderImpl()
+                .connectionPoolSize(1)
+                .build();
+
         Keycloak keycloak = KeycloakBuilder.builder()
                 .serverUrl(SERVER_URL)
                 .realm(REALM_NAME)
-                .clientId(ADMIN_CLI)
+                .clientId(CLIENT_ID)
                 .clientSecret(CLIENT_SECRET)
                 .username(username)
                 .password(password)
                 .grantType(OAuth2Constants.PASSWORD)
-                .resteasyClient(new ResteasyClientBuilderImpl()
-                        .connectionPoolSize(1)
-                        .build())
+                .resteasyClient(client)
                 .build();
-
         return keycloak.tokenManager().getAccessToken();
     }
 
@@ -86,7 +89,7 @@ public class KeycloakProvider {
                 .param("refresh_token", refreshToken);
 
         AccessTokenResponse response = target.request()
-                .header("Authorization", "Bearer " + encodedClientCredentials)
+                .header("Authorization", "Basic " + encodedClientCredentials)
                 .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED), AccessTokenResponse.class);
 
         client.close();
