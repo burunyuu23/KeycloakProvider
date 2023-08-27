@@ -7,6 +7,12 @@ server:
 frontend:
   url: "http://localhost:3000"
 
+users-posts:
+  url: "http://localhost:5002"
+  context-path: ${users-posts.url}/api/users_posts
+  users-controller: ${users-posts.context-path}/users
+  add-user: ${users-posts.users-controller}/add
+
 keycloak:
   port : 8282
   url: "${server.url}:${keycloak.port}"

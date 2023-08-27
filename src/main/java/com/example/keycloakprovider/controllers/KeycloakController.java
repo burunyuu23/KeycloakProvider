@@ -2,8 +2,10 @@ package com.example.keycloakprovider.controllers;
 
 
 import com.example.keycloakprovider.dtos.UserDTO;
+import com.example.keycloakprovider.dtos.requests.RegisterRequestDTO;
 import com.example.keycloakprovider.service.IKeycloakService;
 import com.example.keycloakprovider.util.KeycloakProvider;
+import org.apache.catalina.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;

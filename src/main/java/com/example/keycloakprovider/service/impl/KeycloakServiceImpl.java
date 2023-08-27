@@ -1,17 +1,27 @@
 package com.example.keycloakprovider.service.impl;
 
 import com.example.keycloakprovider.dtos.UserDTO;
+import com.example.keycloakprovider.dtos.requests.RegisterRequestDTO;
 import com.example.keycloakprovider.exceptions.*;
 import com.example.keycloakprovider.service.IKeycloakService;
 import com.example.keycloakprovider.util.KeycloakProvider;
+
+import com.google.gson.Gson;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.resource.*;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
@@ -21,7 +31,14 @@ import java.util.Objects;
 
 @Service
 @Slf4j
+@Data
 public class KeycloakServiceImpl implements IKeycloakService {
+
+    private Gson gson;
+
+    public KeycloakServiceImpl(Gson gson) {
+        this.gson = gson;
+    }
 
     /**
      * Metodo para listar todos los usuarios de Keycloak
@@ -33,6 +50,8 @@ public class KeycloakServiceImpl implements IKeycloakService {
                 .list();
     }
 
+    @Value("${users-posts.add-user}")
+    private String usersPostsCreateUserApi;
     /**
      * Metodo para crear un usuario en keycloak
      * @return String
@@ -48,7 +67,7 @@ public class KeycloakServiceImpl implements IKeycloakService {
         userRepresentation.setEmail(userDTO.getEmail());
         userRepresentation.setUsername(userDTO.getUsername());
         userRepresentation.setEnabled(true);
-        userRepresentation.setEmailVerified(true);
+        userRepresentation.setEmailVerified(false);
 
 
         if (Objects.equals(userDTO.getUsername(), "")) {
@@ -78,7 +97,6 @@ public class KeycloakServiceImpl implements IKeycloakService {
         }
 
         Response response = usersResource.create(userRepresentation);
-
         status = response.getStatus();
 
         if (status == 201) {
@@ -109,6 +127,25 @@ public class KeycloakServiceImpl implements IKeycloakService {
             rolesRepresentation.add(realmResource.roles().get("user").toRepresentation());
 
             realmResource.users().get(userId).roles().realmLevel().add(rolesRepresentation);
+
+
+            RestTemplate restTemplate = new RestTemplate();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            RegisterRequestDTO registerRequestDTO = new RegisterRequestDTO(userId, userDTO.getBirthdate());
+
+            String requestBody = gson.toJson(registerRequestDTO);
+            HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+
+            ResponseEntity<String> responseUsers = restTemplate.postForEntity(usersPostsCreateUserApi, requestEntity, String.class);
+
+            int statusUser = responseUsers.getStatusCode().value();
+
+            if (statusUser != 200) {
+                throw new SomethingWentWrongException();
+            }
 
             return "User created successfully!!";
         } else {

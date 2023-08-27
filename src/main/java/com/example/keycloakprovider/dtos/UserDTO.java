@@ -3,6 +3,7 @@ package com.example.keycloakprovider.dtos;
 import lombok.*;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Set;
 
 
@@ -15,5 +16,6 @@ public class UserDTO implements Serializable{
     String password;
     String firstName;
     String lastName;
+    LocalDate birthdate;
     Set<String> roles;
 }

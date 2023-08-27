@@ -1,6 +1,7 @@
 package com.example.keycloakprovider.service;
 
 import com.example.keycloakprovider.dtos.UserDTO;
+import com.example.keycloakprovider.dtos.requests.RegisterRequestDTO;
 import org.keycloak.representations.idm.UserRepresentation;
 
 import java.util.List;
