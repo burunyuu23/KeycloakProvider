@@ -153,7 +153,6 @@ public class KeycloakServiceImpl implements IKeycloakService {
             if (statusUser != 200) {
                 throw new SomethingWentWrongException();
             }
-
             AccessTokenResponse accessTokenResponse = KeycloakProvider.authenticateUser(userDTO.getUsername(), userDTO.getPassword());
             return modelMapper.map(accessTokenResponse, TokensResponseDTO.class);
         } else {
