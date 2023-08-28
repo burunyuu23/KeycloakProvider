@@ -79,9 +79,6 @@ public class KeycloakProvider {
         ResteasyClient client = new ResteasyClientBuilderImpl().build();
         ResteasyWebTarget target = client.target(SERVER_URL + "/realms/" + REALM_NAME + "/protocol/openid-connect/token");
 
-        String encodedClientCredentials = Base64.getEncoder()
-                .encodeToString((ADMIN_CLI + ":" + CLIENT_SECRET).getBytes());
-
         Form form = new Form()
                 .param("client_id", CLIENT_ID)
                 .param("client_secret", CLIENT_SECRET)
@@ -89,12 +86,21 @@ public class KeycloakProvider {
                 .param("refresh_token", refreshToken);
 
         AccessTokenResponse response = target.request()
-                .header("Authorization", "Basic " + encodedClientCredentials)
+                .header("Authorization", "Basic " + encodedClientCredentials())
                 .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED), AccessTokenResponse.class);
 
         client.close();
 
         return response;
+    }
+
+    public static String getAdminToken() {
+        return authenticateUser(USER_CONSOLE, PASSWORD_CONSOLE).getToken();
+    }
+
+    public static String encodedClientCredentials(){
+        return Base64.getEncoder()
+                .encodeToString((ADMIN_CLI + ":" + CLIENT_SECRET).getBytes());
     }
 
     public static UsersResource getUserResource() {
