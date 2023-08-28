@@ -2,39 +2,41 @@ package com.example.keycloakprovider.controllers;
 
 
 import com.example.keycloakprovider.dtos.UserDTO;
-import com.example.keycloakprovider.dtos.requests.RegisterRequestDTO;
 import com.example.keycloakprovider.dtos.responses.TokensResponseDTO;
+import com.example.keycloakprovider.dtos.responses.UserResponseDTO;
 import com.example.keycloakprovider.service.IKeycloakService;
 import com.example.keycloakprovider.util.KeycloakProvider;
-import org.apache.catalina.User;
+import lombok.Data;
+import org.keycloak.representations.idm.UserRepresentation;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 @RestController
+@Data
 @RequestMapping("/user")
 @CrossOrigin
 public class KeycloakController {
-
     private final IKeycloakService keycloakService;
+    private final ModelMapper modelMapper;
 
-    public KeycloakController(IKeycloakService keycloakService) {
-        this.keycloakService = keycloakService;
-    }
-
-    @PreAuthorize("hasRole('user')")
     @GetMapping("/search")
-    public ResponseEntity<?> findAllUsers(){
-        return ResponseEntity.ok(keycloakService.findAllUsers());
+    public ResponseEntity<List<UserResponseDTO>> findAllUsers(){
+        List<UserResponseDTO> userRepresentationList = keycloakService.findAllUsers().stream().map(user -> modelMapper.map(user, UserResponseDTO.class)).toList();
+        return ResponseEntity.ok(userRepresentationList);
     }
 
-    @PreAuthorize("hasRole('user')")
     @GetMapping("/search/{username}")
-    public ResponseEntity<?> searchUserByUsername(@PathVariable String username){
-        return ResponseEntity.ok(KeycloakProvider.findUserByUsername(username));
+    public ResponseEntity<UserResponseDTO> searchUserByUsername(@PathVariable String username){
+        List<UserRepresentation> userRepresentationList = KeycloakProvider.findUserByUsername(username);
+        if (userRepresentationList.isEmpty())
+            return ResponseEntity.badRequest().build();
+        return ResponseEntity.ok(modelMapper.map(userRepresentationList.get(0), UserResponseDTO.class));
     }
 
     @PostMapping("/create")
