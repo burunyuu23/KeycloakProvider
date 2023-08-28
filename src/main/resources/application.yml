@@ -31,15 +31,6 @@ spring:
           issuer-uri: ${keycloak.url}/realms/${keycloak.realm}
           jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
 
-#  datasource:
-#    driver-class-name: org.postgresql.Driver
-#    url: jdbc:postgresql://localhost:5432/danilkk_db
-#    username: danilkk
-#    password: 123
-#  jpa:
-#    database: postgresql
-#    database-platform: org.hibernate.dialect.PostgreSQLDialect
-#
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
