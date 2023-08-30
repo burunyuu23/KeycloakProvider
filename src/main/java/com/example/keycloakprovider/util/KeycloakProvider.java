@@ -1,5 +1,6 @@
 package com.example.keycloakprovider.util;
 
+import com.example.keycloakprovider.exceptions.InvalidRefreshTokenException;
 import lombok.RequiredArgsConstructor;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
@@ -85,11 +86,15 @@ public class KeycloakProvider {
                 .param("grant_type", "refresh_token")
                 .param("refresh_token", refreshToken);
 
-        AccessTokenResponse response = target.request()
-                .header("Authorization", "Basic " + encodedClientCredentials())
-                .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED), AccessTokenResponse.class);
-
-        client.close();
+        AccessTokenResponse response = null;
+        try {
+            response = target.request()
+                    .header("Authorization", "Basic " + encodedClientCredentials())
+                    .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED), AccessTokenResponse.class);
+            client.close();
+        } catch (Exception e) {
+            throw new InvalidRefreshTokenException();
+        }
 
         return response;
     }
